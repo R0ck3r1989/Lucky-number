@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍀 Lucky Sequence Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+
+        .date-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .date-inputs > div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            grid-column: 1 / -1;
+        }
+
+        .btn-calculate:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-calculate:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-today {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-today:hover {
+            background: #e0e0e0;
+            border-color: #d0d0d0;
+        }
+
+        .btn-random {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-random:hover {
+            background: #e0e0e0;
+            border-color: #d0d0d0;
+        }
+
+        .results {
+            display: none;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-section {
+            margin-bottom: 20px;
+        }
+
+        .result-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            color: #666;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .lucky-sequence {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .lucky-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .lucky-number:hover {
+            transform: scale(1.05);
+        }
+
+        .number-pool {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 8px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .pool-number {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .date-display {
+            font-size: 1.3em;
+            color: #667eea;
+            font-weight: 600;
+            padding: 10px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .pattern-info {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #fadbd8;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .error.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .lucky-sequence {
+                grid-template-columns: repeat(5, 1fr);
+            }
+
+            .lucky-number {
+                font-size: 1.4em;
+                padding: 15px 10px;
+            }
+
+            .date-inputs {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍀 Lucky Sequence</h1>
+        <p class="subtitle">Calculate your lucky numbers based on your date</p>
+
+        <div class="input-group">
+            <label>Select Your Date</label>
+            <div class="date-inputs">
+                <div>
+                    <label style="font-size: 0.9em; font-weight: 500; margin-bottom: 5px;">Month</label>
+                    <select id="month">
+                        <option value="">Select Month</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 0.9em; font-weight: 500; margin-bottom: 5px;">Day</label>
+                    <input type="number" id="day" min="1" max="31" placeholder="1-31">
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-today" onclick="setToday()">📅 Today's Date</button>
+            <button class="btn-random" onclick="setRandomDate()">🎲 Random Date</button>
+        </div>
+
+        <button class="btn-calculate" onclick="calculateSequence()">✨ Calculate Lucky Sequence</button>
+
+        <div class="error" id="error"></div>
+
+        <div class="results" id="results">
+            <div class="result-section">
+                <div class="result-label">📅 Your Date</div>
+                <div class="date-display" id="dateDisplay"></div>
+            </div>
+
+            <div class="result-section">
+                <div class="result-label">✨ Your Lucky Sequence</div>
+                <div class="lucky-sequence" id="luckySequence"></div>
+            </div>
+
+            <div class="result-section">
+                <div class="result-label">🎲 Number Pool (1-36)</div>
+                <div class="number-pool" id="numberPool"></div>
+            </div>
+
+            <div class="result-section">
+                <div class="result-label">🔑 Algorithm Pattern</div>
+                <div class="pattern-info" id="patternInfo"></div>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 How it works:</strong> Your lucky numbers are calculated using your month, day, and a deterministic algorithm that creates a unique sequence for your date.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 
+                       'July', 'August', 'September', 'October', 'November', 'December'];
+
+        function setToday() {
+            const today = new Date();
+            document.getElementById('month').value = today.getMonth() + 1;
+            document.getElementById('day').value = today.getDate();
+            calculateSequence();
+        }
+
+        function setRandomDate() {
+            const month = Math.floor(Math.random() * 12) + 1;
+            const daysInMonth = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            const day = Math.floor(Math.random() * daysInMonth[month]) + 1;
+            document.getElementById('month').value = month;
+            document.getElementById('day').value = day;
+            calculateSequence();
+        }
+
+        function validateInputs() {
+            const month = parseInt(document.getElementById('month').value);
+            const day = parseInt(document.getElementById('day').value);
+            const errorDiv = document.getElementById('error');
+
+            errorDiv.classList.remove('show');
+
+            if (!month || !day) {
+                errorDiv.textContent = '⚠️ Please select both month and day.';
+                errorDiv.classList.add('show');
+                return null;
+            }
+
+            if (day < 1 || day > 31) {
+                errorDiv.textContent = '⚠️ Day must be between 1 and 31.';
+                errorDiv.classList.add('show');
+                return null;
+            }
+
+            return { month, day };
+        }
+
+        function calculateSequence() {
+            const inputs = validateInputs();
+            if (!inputs) return;
+
+            const { month, day } = inputs;
+            const sequence = window.calculateLuckySequence(month, day);
+
+            document.getElementById('dateDisplay').textContent = 
+                `${months[month]} ${day}${getDayOrdinal(day)}`;
+
+            const luckySequenceDiv = document.getElementById('luckySequence');
+            luckySequenceDiv.innerHTML = sequence.sequence
+                .map(num => `<div class="lucky-number">${num}</div>`)
+                .join('');
+
+            const numberPoolDiv = document.getElementById('numberPool');
+            numberPoolDiv.innerHTML = sequence.pool
+                .map(num => `<div class="pool-number">${num}</div>`)
+                .join('');
+
+            document.getElementById('patternInfo').textContent = 
+                `${sequence.pattern}`;
+
+            document.getElementById('results').classList.add('show');
+        }
+
+        function getDayOrdinal(day) {
+            if (day > 3 && day < 21) return 'th';
+            switch (day % 10) {
+                case 1: return 'st';
+                case 2: return 'nd';
+                case 3: return 'rd';
+                default: return 'th';
+            }
+        }
+
+        window.calculateLuckySequence = function(month, day) {
+            const seed = month * 1000 + day;
+            let rng = seed;
+            
+            function seededRandom() {
+                rng = (rng * 9301 + 49297) % 233280;
+                return rng / 233280;
+            }
+
+            let pool = Array.from({ length: 36 }, (_, i) => i + 1);
+            
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(seededRandom() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            
+            const random_pool = pool.slice(0, 15).sort((a, b) => a - b);
+
+            const num1 = month;
+            const num2 = day;
+            const total = month + day;
+
+            let key_number = null;
+            let pattern_used = "";
+
+            // Try "Day + small number from pool"
+            for (let p of random_pool) {
+                if (0 < (p - day) && (p - day) < 10) {
+                    key_number = p;
+                    pattern_used = `Day (${day}) + ${p - day} = Key Number (${p})`;
+                    break;
+                }
+            }
+
+            // Try "Total + small number from pool"
+            if (!key_number) {
+                for (let p of random_pool) {
+                    if (0 < (p - total) && (p - total) < 10) {
+                        key_number = p;
+                        pattern_used = `Total (${total}) + ${p - total} = Key Number (${p})`;
+                        break;
+                    }
+                }
+            }
+
+            // Use Total as key if nothing matches
+            if (!key_number) {
+                key_number = total;
+                pattern_used = `Total (${month} + ${day}) = Key Number (${total})`;
+            }
+
+            const addends = random_pool.filter(p => p < 10);
+            const addend1 = addends.length > 0 ? addends[0] : 1;
+            const addend2 = addends.length > 1 ? addends[1] : 2;
+
+            const num3 = key_number;
+            const num4 = key_number + addend1;
+            const num5 = key_number + addend2;
+
+            let final_sequence = [num1, num2, num3, num4, num5]
+                .filter(n => n >= 1 && n <= 36);
+
+            const seen = new Set();
+            const unique_sequence = [];
+            for (let n of final_sequence) {
+                let num = n;
+                while (seen.has(num)) {
+                    num = Math.floor(seededRandom() * 36) + 1;
+                }
+                seen.add(num);
+                unique_sequence.push(num);
+            }
+
+            return {
+                sequence: unique_sequence.sort((a, b) => a - b),
+                pool: random_pool,
+                pattern: pattern_used
+            };
+        };
+
+        document.getElementById('day').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculateSequence();
+        });
+
+        window.addEventListener('load', setToday);
+    </script>
+</body>
+</html>
